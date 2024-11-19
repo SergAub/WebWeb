@@ -1,0 +1,85 @@
+﻿@page
+@model WebWeB.Pages.HomePageModel
+@{
+	ViewData["Title"] = "Главная страница";
+}
+
+<head>
+    <link type="text/css" rel="stylesheet" href="css/ModeratorStyle.css" />
+</head>
+
+<h2>Добро пожаловать!</h2>
+<p>Вы успешно вошли в систему.</p>
+
+<h3>Каталог товаров:</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Название товара</th>
+            <th>Описание</th>
+            <th>В наличии</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Goods)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@(item.InStock ? "Да" : "Нет")</td>
+                <td>
+                    @if (item.InStock)
+                    {
+                        <form method="post" asp-page-handler="CreateOrder">
+                            <input type="hidden" name="goodsId" value="@item.Id" />
+                            <input type="number" name="quantity" value="1" min="1" />
+                            <button type="submit" class="btn btn-primary">Заказать</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span>Нет в наличии</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Отображение заказов пользователя -->
+@if (Model.Orders != null && Model.Orders.Count > 0)
+{
+    <h3>Мои заказы:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Количество</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td>@order.Goods.Name</td>
+                    <td>@order.Count</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>У вас еще нет заказов.</p>
+}
